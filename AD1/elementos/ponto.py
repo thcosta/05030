@@ -1,11 +1,65 @@
 from abc import ABC, abstractmethod
 # from elementos.mapa import Mapa
 
+__all__ = ['Ponto']
+
 # classe abstrata
 class Ponto(ABC):
+  """
+  Uma classe abstrata que representa um ponto no mapa do campo minado
+
+  ...
+
+  Attributes
+  ----------
+  mapa : Mapa object
+    o mapa do campo minado no qual o ponto está localizado
+  posicao_x : int
+    a coordenada x do ponto no mapa
+  posicao_y : int
+    a coordenada y do ponto no mapa
+  _aberto : bool
+    representa se o ponto está aberto (True) ou não (False)
+  _marcado : bool
+    representa se o ponto está marcado (True) ou não (False)
+  _simbolo : str
+    é símbolo mostrado quando o ponto está aberto no mapa
+
+  Methods
+  -------
+  abrir()
+    Seta o ponto como aberto
+  aberto()
+    Verifica se o ponto está aberto
+  marcar()
+    Seta o ponto como marcado
+  marcado()
+    Verifica se o ponto está marcado
+  vizinhos()
+    Retorna os vizinhos do ponto
+  imprimir()
+    Imprime o símbolo do ponto
+  """
+    
   simbolo = ""
 
   def __init__(self, mapa, posicao_x, posicao_y) -> None:
+    """
+    Parameters
+    ----------
+    mapa : Mapa object
+      O mapa do campo minado no qual o ponto está localizado
+    posicao_x : int
+      A coordenada x do ponto no mapa
+    posicao_y : int
+      A coordenada y do ponto no mapa
+    _aberto : bool
+      Representa se o ponto está aberto (True) ou não (False)
+    _marcado : bool
+      Representa se o ponto está marcado (True) ou não (False)
+    _simbolo : str
+      É símbolo mostrado quando o ponto está aberto no mapa
+    """
     self.mapa = mapa
     self.posicao_x = posicao_x
     self.posicao_y = posicao_y
@@ -46,22 +100,57 @@ class Ponto(ABC):
     return self._simbolo
   
   def abrir(self):
-    self._aberto = True
-    self.desmarcar()
+    """Seta o ponto como aberto e desmarcado
+
+    Raises
+    ------
+    ValueError
+      Se o ponto já estiver aberto, retorna erro 'Ponto já revelado!'
+    """
+    if (not self._aberto):
+      self._aberto = True
+      self._marcado = False
+    else:
+      raise ValueError("Ponto já revelado!")
 
   def aberto(self) -> bool:
+    """Verifica se o ponto está aberto
+    Returns
+    ----------
+    bool
+      representa se o ponto está aberto (True) ou não (False)
+    """
     return self._aberto == True
 
   def marcar(self):
-    self._marcado = not self._marcado
-  
-  def desmarcar(self):
-    self._marcado = False
+    """Seta o ponto como marcado ou desmarcado
+
+    Raises
+    ------
+    ValueError
+      Se o ponto já estiver aberto, retorna erro 'Ponto já revelado!'
+    """
+    if (not self._aberto):
+      self._marcado = not self._marcado
+    else:
+      raise ValueError("Ponto já revelado!")
   
   def marcado(self) -> bool:
+    """Verifica se o ponto está marcado
+    Returns
+    ----------
+    bool
+      representa se o ponto está marcado (True) ou não (False)
+    """
     return self._marcado == True
   
   def vizinhos(self) -> list:
+    """Retorna os pontos vizinhos
+    Returns
+    ----------
+    list
+      lista de pontos vizinhos
+    """
     vizinhos = list()
     for i in range(self.posicao_x - 1, self.posicao_x + 2):
       if i < 0 or i >= self.mapa.nivel: continue
@@ -71,9 +160,6 @@ class Ponto(ABC):
         vizinhos.append(self.mapa.pontos[i][j])
     return vizinhos
 
-  def remover(self):
-    self.mapa = None
-    del self
-
   def imprimir(self):
+    """Imprime o símbolo do ponto"""
     print(self._simbolo, end="")
