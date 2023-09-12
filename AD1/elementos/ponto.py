@@ -68,7 +68,7 @@ class Ponto(ABC):
     self._simbolo = type(self).simbolo
   
   @property
-  def mapa(self) -> int:
+  def mapa(self) -> object:
     return self._mapa
   
   @mapa.setter

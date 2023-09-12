@@ -32,7 +32,7 @@ class CampoMinado:
     self.mapa = None
 
   @property
-  def mapa(self) -> int:
+  def mapa(self) -> mapa.Mapa:
     return self._mapa
   
   @mapa.setter

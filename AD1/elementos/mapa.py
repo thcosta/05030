@@ -66,7 +66,7 @@ class Mapa:
     self._nivel = nivel
   
   @property
-  def pontos(self) -> int:
+  def pontos(self) -> list:
     return self._pontos
 
   def montar(self):
