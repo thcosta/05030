@@ -22,9 +22,9 @@ class PontoDica(Ponto):
   
   def __init__(self, mapa, posicao_x, posicao_y, frame_grid) -> None:
     super().__init__(mapa, posicao_x, posicao_y, frame_grid)
-    self._simbolo = r'imagens/' + str(self.__qtd_minas_vizinhas()) + '.png'
+    self._simbolo = r'imagens/' + str(self.__qtd_minas_vizinhas__()) + '.png'
 
-  def __qtd_minas_vizinhas(self) -> int:
+  def __qtd_minas_vizinhas__(self) -> int:
     """Retorna a quantidade de minas vizinhas ao ponto
     Returns
     ----------

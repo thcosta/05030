@@ -39,8 +39,6 @@ class Ponto(ABC):
     Verifica se o ponto está marcado
   vizinhos()
     Retorna os vizinhos do ponto
-  imprimir()
-    Imprime o símbolo do ponto
   """
     
   simbolo = ""
@@ -96,23 +94,6 @@ class Ponto(ABC):
 
   def posicao_y(self) -> int:
     return self.frame.posicao_x
-  
-  def __construir_frame__(self):
-    self.frame = tk.Frame(master=self.frame_grid, width=65, height=65)
-    self.frame.grid(row=self.posicao_x, column=self.posicao_y)
-    imagem = tk.PhotoImage(file='imagens/vazio.png')
-    self.frame.imagem = imagem
-    self.frame.botao = tk.Button(**{
-      "fg": "white",
-      "compound": "right",
-      "activeforeground": "white",
-      "relief": tk.RIDGE,
-      "master": self.frame,  
-      "image": imagem, 
-      "width": 65, 
-      "height": 65
-    })
-    self.frame.botao.pack()
 
   def mostrar(self):
     frame = self.frame
@@ -183,6 +164,19 @@ class Ponto(ABC):
         vizinhos.append(self.mapa.pontos[i][j])
     return vizinhos
 
-  def imprimir(self):
-    """Imprime o símbolo do ponto"""
-    print(self._simbolo, end="")
+  def __construir_frame__(self):
+    self.frame = tk.Frame(master=self.frame_grid, width=65, height=65)
+    self.frame.grid(row=self.posicao_x, column=self.posicao_y)
+    imagem = tk.PhotoImage(file='imagens/vazio.png')
+    self.frame.imagem = imagem
+    self.frame.botao = tk.Button(**{
+      "fg": "white",
+      "compound": "right",
+      "activeforeground": "white",
+      "relief": tk.RIDGE,
+      "master": self.frame,  
+      "image": imagem, 
+      "width": 65, 
+      "height": 65
+    })
+    self.frame.botao.pack()

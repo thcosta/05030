@@ -1,16 +1,17 @@
 import tkinter as tk
-import tkinter.messagebox as messagebox
 
 __all__ = ['JanelaInicio', 'JanelaJogo']
 
 EVENTO_CLICK = "<Button-1>"
+
+BACKGROUND_PADRAO = "#c5cbe3"
 
 FONTE_PADRAO = ("Helvetica", 16, "bold")
 
 LABEL_PADRAO = {
   "font": FONTE_PADRAO, 
   "anchor": "center",
-  "bg": "#c5cbe3"
+  "bg": BACKGROUND_PADRAO
 }
 
 CAMPO_PADRAO = {
@@ -35,7 +36,7 @@ class Janela:
   def __init__(self, size) -> None:
     self.janela = tk.Tk()
     self.janela.geometry(size)
-    self.janela.configure(bg = "#c5cbe3")
+    self.janela.configure(bg = BACKGROUND_PADRAO)
     self.janela.title('Campo Minado')
 
   @staticmethod
@@ -66,90 +67,143 @@ class Janela:
 class JanelaInicio(Janela):
   def __init__(self) -> None:
     super().__init__("600x200")
-    frame = tk.Frame(master=self.janela, bg="#c5cbe3")
-    self.janela.configure(bg = "#c5cbe3")
-    self.criarCampoNivel(frame)
-    self.criarBotaoIniciar(frame)
+    frame = tk.Frame(master=self.janela, 
+                    bg=BACKGROUND_PADRAO)
+    self.janela.configure(bg = BACKGROUND_PADRAO)
+    self.__criar_campo_nivel__(frame)
+    self.__criar_botao_iniciar__(frame)
     frame.pack()
 
-  def criarCampoNivel(self, frame):
-    self.label({ "text": "Qual o nível de dificuldade desejado?", "master": frame }).grid(row=1,column=1, pady=15)
-    self.campo_nivel = self.campo({ "width": 8, "master": frame })
+  def __criar_campo_nivel__(self, frame):
+    self.label({ 
+      "text": "Qual o nível de dificuldade desejado?", 
+      "master": frame 
+    }).grid(row=1,column=1, pady=15)
+    self.campo_nivel = self.campo({ 
+      "width": 8, 
+      "master": frame 
+    })
     self.campo_nivel.grid(row=2,column=1)
   
-  def criarBotaoIniciar(self, frame):
+  def __criar_botao_iniciar__(self, frame):
     icone = tk.PhotoImage(file=r'imagens/iniciar.png')
     frame.icone = icone
-    self.botao_iniciar = self.botao({ "text": "Começar", 
-                        "image": icone, 
-                        "master": frame })
+    self.botao_iniciar = self.botao({ 
+      "text": "Começar", 
+      "image": icone, 
+      "master": frame 
+    })
     self.botao_iniciar.grid(row=3,column=1,pady=20)
 
 class JanelaJogo(Janela):
   def __init__(self, nivel) -> None:
     self.janela = tk.Toplevel()
     self.janela.title('Campo Minado')
-    self.janela.configure(bg = "#c5cbe3")
+    self.janela.configure(bg = BACKGROUND_PADRAO)
     self.tamanho_grid = 65*nivel
-    self.criarGridMapa(nivel)
-    self.criarBotoes()
+    self.__criar_grid_mapa__(nivel)
+    self.__criar_botoes__()
+    self.janela.protocol("WM_DELETE_WINDOW", self.fechar)
 
-  def criarGridMapa(self, nivel):
-    frame_principal = tk.Frame(master=self.janela, width= self.tamanho_grid + 100, height=self.tamanho_grid + 20, bg="#c5cbe3")
+  def __criar_grid_mapa__(self, nivel):
+    frame_principal = tk.Frame(master=self.janela, 
+                              width= self.tamanho_grid + 50, 
+                              height=self.tamanho_grid + 40, 
+                              bg=BACKGROUND_PADRAO)
     frame_principal.pack()
-    self.frame_grid = tk.Frame(master=frame_principal, width= self.tamanho_grid, height=self.tamanho_grid, bg="#c5cbe3")
-    self.frame_grid.pack(side=tk.LEFT)
-    frame_contador = tk.Frame(master=frame_principal, width= 100, height=self.tamanho_grid, background="red", padx=20, bg="#c5cbe3")
-    frame_contador.pack(side=tk.RIGHT)
-    self.criarCampoContador(frame_contador, nivel)
 
-  def criarCampoContador(self, frame, nivel):
-    self.label({ "text": "Quantidade de Bombas", "master": frame }).grid(row=1,column=1, pady=15, padx=10)
-    self.campo_contador = self.campo({ "width": 8, "master": frame, "state": tk.DISABLED })
-    self.campo_contador.grid(row=2, column=1, padx=10)
+    frame_esquerdo = tk.Frame(master=frame_principal, 
+                              height=self.tamanho_grid, 
+                              bg=BACKGROUND_PADRAO)
+    frame_esquerdo.pack(side=tk.LEFT, fill=tk.Y)
+    self.__criar_campo_contador__(frame_esquerdo, nivel)
+
+    frame_direito = tk.Frame(master=frame_principal, 
+                            width= self.tamanho_grid, 
+                            height=self.tamanho_grid + 2, 
+                            # padx=20, 
+                            bg=BACKGROUND_PADRAO)
+    frame_direito.pack(side=tk.RIGHT)
+    
+    self.label({ 
+      "text": "Selecione uma coordenada", 
+      "master": frame_direito, 
+      "height": 2 
+      }).pack(fill=tk.X)
+    self.frame_grid = tk.Frame(master=frame_direito, 
+                              width= self.tamanho_grid, 
+                              height=self.tamanho_grid, 
+                              bg=BACKGROUND_PADRAO)
+    self.frame_grid.pack(side=tk.BOTTOM)
+
+
+  def __criar_campo_contador__(self, frame, nivel):
+    self.label({ 
+      "text": "Quantidade de Bombas:", 
+      "master": frame, 
+      "height": 2 
+    }).pack(side=tk.TOP)
+    self.campo_contador = self.campo({ 
+      "width": 8, 
+      "master": frame
+    })
+    self.campo_contador.pack(side=tk.TOP)
     self.campo_contador.insert(0, nivel)
+    self.campo_contador.configure(state=tk.DISABLED)
   
-  def criarBotoes(self):
-    frame_secundario = tk.Frame(master=self.janela, width= self.tamanho_grid + 100, height=50, bg="#c5cbe3")
+  def __criar_botoes__(self):
+    frame_secundario = tk.Frame(master=self.janela, 
+                                width= self.tamanho_grid + 100, 
+                                height=50, 
+                                bg=BACKGROUND_PADRAO)
     frame_secundario.pack()
-    frame_botoes = tk.Frame(master=frame_secundario, width= self.tamanho_grid + 100, height=50, bg="#c5cbe3")
+    frame_botoes = tk.Frame(master=frame_secundario, 
+                            width= self.tamanho_grid + 100, 
+                            height=50, 
+                            bg=BACKGROUND_PADRAO)
     frame_botoes.pack(side=tk.BOTTOM)
-    self.criarBotaoReiniciar(frame_botoes)
-    self.criarBotaoRecomecar(frame_botoes)
-    self.criarBotaoDica(frame_botoes)
-    self.criarBotaoSair(frame_botoes)
+    self.__criar_botao_reiniciar__(frame_botoes)
+    self.__criar_botao_recomecar__(frame_botoes)
+    self.__criar_botao_dica__(frame_botoes)
+    self.__criar_botao_sair__(frame_botoes)
 
-  def criarBotaoReiniciar(self, frame):
+  def __criar_botao_reiniciar__(self, frame):
     icone = tk.PhotoImage(file=r'imagens/reiniciar.png')
     frame.icone_reiniciar = icone
-    self.botao_reiniciar = self.botao({ "text": "Reiniciar", 
-                        "image": icone, 
-                        "master": frame})
+    self.botao_reiniciar = self.botao({ 
+      "text": "Reiniciar", 
+      "image": icone, 
+      "master": frame
+    })
     self.botao_reiniciar.grid(row=1,column=1,pady=20, padx=5)
-    # botao_iniciar.bind(EVENTO_CLICK, self.eventoIniciar)
 
-  def criarBotaoRecomecar(self, frame):
+  def __criar_botao_recomecar__(self, frame):
     icone = tk.PhotoImage(file=r'imagens/recomecar.png')
     frame.icone_recomecar = icone
-    self.botao_recomecar = self.botao({ "text": "Novo Jogo", 
-                        "image": icone, 
-                        "master": frame})
+    self.botao_recomecar = self.botao({ 
+      "text": "Novo Jogo", 
+      "image": icone, 
+      "master": frame
+    })
     self.botao_recomecar.grid(row=1,column=2,pady=20, padx=5)
 
-  def criarBotaoDica(self, frame):
+  def __criar_botao_dica__(self, frame):
     icone = tk.PhotoImage(file=r'imagens/dica.png')
     frame.icone_dica = icone
-    self.botao_dica = self.botao({ "text": "Dica", 
-                        "image": icone, 
-                        "master": frame})
+    self.botao_dica = self.botao({ 
+      "text": "Dica", 
+      "image": icone, 
+      "master": frame
+    })
     self.botao_dica.grid(row=1,column=3,pady=20, padx=5)
-    # botao_iniciar.bind(EVENTO_CLICK, self.eventoIniciar)
 
-  def criarBotaoSair(self, frame):
+  def __criar_botao_sair__(self, frame):
     icone = tk.PhotoImage(file=r'imagens/sair.png')
     frame.icone_sair = icone
-    self.botao_sair = self.botao({ "text": "Sair", 
-                        "image": icone, 
-                        "master": frame })
+    self.botao_sair = self.botao({ 
+      "text": "Sair", 
+      "image": icone, 
+      "master": frame 
+    })
     self.botao_sair.grid(row=1,column=4,pady=20, padx=5)
     self.botao_sair.bind(EVENTO_CLICK, lambda _evento: self.janela.quit())

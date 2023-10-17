@@ -1,7 +1,6 @@
 from elementos.ponto_vazio import *
 from elementos.ponto_mina import *
 from elementos.ponto_dica import *
-import tkinter.messagebox as messagebox
 import random
 
 __all__ = ['Mapa']
@@ -23,8 +22,6 @@ class Mapa:
   -------
   montar()
     Cria os pontos do campo minado, podendo ser pontos do tipo mina, dica ou vazio
-  imprimir()
-    Mostra o mapa do campo minado mostrando apenas os pontos abertos
   revelar()
     Mostra o mapa do campo minado mostrando todos os pontos
   qtd_minas_descobertas()
@@ -33,13 +30,13 @@ class Mapa:
     Marca o ponto do campo minado da coordenada x,y
   revelar_ponto(posicao_x, posicao_y)
     Abre o ponto do campo minado da coordenada x,y
-  __minas()
+  __minas__()
     Retorna os pontos que são mina do mapa do campo minado
-  __iniciar_mapa_vazio()
+  __iniciar_mapa_vazio__()
     Preenche todo o mapa do campo minado com os pontos do tipo vazio
-  __criar_minas()
+  __criar_minas__()
     Cria aleatoriamente as minas no mapa do campo minado
-  __preencher_dicas()
+  __preencher_dicas__()
     Cria, para cada mina do campo minado, os pontos do tipo dica que são vizinhos da mina
   """
 
@@ -82,9 +79,9 @@ class Mapa:
 
   def montar(self):
     """Cria os pontos do campo minado, podendo ser pontos do tipo mina, dica ou vazio"""
-    self.__iniciar_mapa_vazio()
-    self.__criar_minas()
-    self.__preencher_dicas()
+    self.__iniciar_mapa_vazio__()
+    self.__criar_minas__()
+    self.__preencher_dicas__()
 
   def revelar(self):
     """Mostra o mapa do campo minado mostrando todos os pontos"""
@@ -103,7 +100,7 @@ class Mapa:
     minas_descobertas = list(filter(lambda ponto: not(ponto.aberto()), pontos))
     return len(minas_descobertas)
 
-  def __minas(self) -> list:
+  def __minas__(self) -> list:
     """Retorna os pontos que são mina do mapa do campo minado
     Returns
     -------
@@ -113,7 +110,7 @@ class Mapa:
     pontos = list(coluna for linha in self._pontos for coluna in linha)
     return list(filter(lambda ponto: isinstance(ponto, PontoMina), pontos))
   
-  def __iniciar_mapa_vazio(self):
+  def __iniciar_mapa_vazio__(self):
     """Preenche todo o mapa do campo minado com os pontos do tipo vazio"""
     for posicao_x in range(self.nivel):
       self._pontos[posicao_x] = list(range(self.nivel))
@@ -121,7 +118,7 @@ class Mapa:
         novo_ponto_vazio = PontoVazio(self, posicao_x, posicao_y, self.frame)
         self._pontos[posicao_x][posicao_y] = novo_ponto_vazio      
 
-  def __criar_minas(self):
+  def __criar_minas__(self):
     """Cria aleatoriamente as minas no mapa do campo minado"""
     i = 0
     while(i < self.nivel):
@@ -133,9 +130,9 @@ class Mapa:
         continue
       self._pontos[posicao_x][posicao_y] = PontoMina(self, posicao_x, posicao_y, self.frame)
   
-  def __preencher_dicas(self):
+  def __preencher_dicas__(self):
     """Cria, para cada mina do campo minado, os pontos do tipo dica que são vizinhos da mina"""
-    for mina in self.__minas():
+    for mina in self.__minas__():
       vizinhos = mina.vizinhos();
       for vizinho in vizinhos:
         if isinstance(vizinho, PontoVazio):

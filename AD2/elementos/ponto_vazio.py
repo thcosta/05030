@@ -17,7 +17,7 @@ class PontoVazio(Ponto):
   -------
   abrir()
     Abre o ponto e manda abrir os pontos vizinhos
-  __abrir_vizinhos()
+  __abrir_vizinhos__()
     Abre os pontos vizinhos
   """
   
@@ -26,9 +26,9 @@ class PontoVazio(Ponto):
   def abrir(self):
     """Abre o ponto e manda abrir os pontos vizinhos"""
     super().abrir()
-    self.__abrir_vizinhos()
+    self.__abrir_vizinhos__()
 
-  def __abrir_vizinhos(self):
+  def __abrir_vizinhos__(self):
     """Abre os pontos vizinhos"""
     vizinhos = self.vizinhos()
     for vizinho in vizinhos:

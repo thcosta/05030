@@ -19,16 +19,9 @@ class CampoMinado:
     Pergunta o nível de dificuldade do jogo e monta o campo minado
   jogar()
     Pergunta as jogadas e revela ou marca os pontos de acordo com as entradas do jogador
-  revelar()
-    Mostra o mapa do campo minado mostrando todos os pontos
   __deve_continuar()
     Verifica se todas as minas já foram marcadas
   __nova_jogada(valor_maximo)
-    Roda a nova jogada
-  __ler_coordenadas(posicao_x, posicao_y)
-    Solicita as coordenadas da nova jogada    
-  __escolher_jogada()
-    Escolhe o tipo de jogada, revelar - R ou marcar - M
   """
 
   def __init__(self) -> None:
@@ -36,7 +29,11 @@ class CampoMinado:
     self.mapa = None
     self.janela_inicio = None
     self.janela_mapa = None
-    self.dicas_disponiveis = 3
+    self.dicas_disponiveis = None
+    self.__iniciar_janela_inicial__()
+
+  def jogar(self) -> None:
+    self.janela_inicio.janela.mainloop()
 
   @property
   def mapa(self) -> mapa.Mapa:
@@ -46,12 +43,20 @@ class CampoMinado:
   def mapa(self, mapa):
     self._mapa = mapa
 
-  def abrir_janela_inicial(self):
-    self.janela_inicio = janelas.JanelaInicio()
-    self.janela_inicio.botao_iniciar.bind(janelas.EVENTO_CLICK, self.eventoIniciar)
-    self.janela_inicio.janela.mainloop()
+  @property
+  def nivel(self) -> int:
+    return self._nivel
 
-  def abrir_janela_mapa(self):
+  @nivel.setter
+  def nivel(self, nivel):
+    self._nivel = nivel
+    self.dicas_disponiveis = nivel - 1 if nivel and nivel > 1 else 0
+
+  def __iniciar_janela_inicial__(self):
+    self.janela_inicio = janelas.JanelaInicio()
+    self.janela_inicio.botao_iniciar.bind(janelas.EVENTO_CLICK, self.__evento_iniciar__)
+
+  def __iniciar_janela_mapa__(self):
     self.janela_mapa = janelas.JanelaJogo(self.nivel)
     self.mapa = mapa.Mapa(self.nivel, self.janela_mapa.frame_grid)
     self.janela_inicio.esconder()
@@ -61,22 +66,23 @@ class CampoMinado:
     for posicao_x in range(self.nivel):
       for posicao_y in range(self.nivel):
         ponto = self.mapa.pontos[posicao_x][posicao_y]
-        ponto.frame.botao.bind("<Button-1>", lambda _evento, ponto=ponto: self.eventoSelecionar(ponto))
-    self.janela_mapa.botao_reiniciar.bind(janelas.EVENTO_CLICK, self.eventoReiniciar)
-    self.janela_mapa.botao_recomecar.bind(janelas.EVENTO_CLICK, self.eventoRecomecar)
-    self.janela_mapa.botao_dica.bind(janelas.EVENTO_CLICK, self.eventoDica)
+        ponto.frame.botao.bind("<Button-1>", lambda _evento, ponto=ponto: self.__evento_selecionar__(ponto))
+    self.janela_mapa.botao_reiniciar.bind(janelas.EVENTO_CLICK, self.__evento_reiniciar__)
+    self.janela_mapa.botao_recomecar.bind(janelas.EVENTO_CLICK, self.__evento_recomecar__)
+    self.janela_mapa.botao_dica.bind(janelas.EVENTO_CLICK, self.__evento_dica__)
 
-  def eventoIniciar(self, _evento):
+  def __evento_iniciar__(self, _evento):
     nivel =  self.janela_inicio.campo_nivel.get()
-    if not nivel.isnumeric() or int(nivel) < 0:
-        messagebox.showerror(title="Erro!", message="O nível deve ser um número inteiro!")
+    if not nivel.isnumeric() or int(nivel) <= 0:
+        messagebox.showerror(title="Erro!", message="O nível deve ser um número inteiro positivo!")
+        return
     self.nivel = int(nivel)
-    self.abrir_janela_mapa()
+    self.__iniciar_janela_mapa__()
 
-  def eventoSelecionar(self, ponto):
+  def __evento_selecionar__(self, ponto):
     try:
       ponto.abrir()
-      if(self.__nao_deve_continuar__()):
+      if(self.__minas_descobertas__()):
         self.mapa.revelar()
         messagebox.showinfo(title="Ganhou!", message='Você ganhou, parabéns!')
     except ponto_mina.ExplosaoMina as error:
@@ -85,33 +91,38 @@ class CampoMinado:
     except ValueError as error:
       messagebox.showwarning(title="Erro!", message=error)
 
-  def eventoReiniciar(self, _evento):
+  def __evento_reiniciar__(self, _evento):
     for posicao_x in range(self.nivel):
       for posicao_y in range(self.nivel):
         ponto = self.mapa.pontos[posicao_x][posicao_y]
         ponto.fechar()
-        ponto.frame.botao.bind("<Button-1>", lambda _evento, ponto=ponto: self.eventoSelecionar(ponto))
+        ponto.frame.botao.bind("<Button-1>", lambda _evento, ponto=ponto: self.__evento_selecionar__(ponto))
 
-  def eventoRecomecar(self, _evento):
+  def __evento_recomecar__(self, _evento):
     self.janela_inicio.mostrar()
     self.janela_mapa.esconder()
 
-  def eventoDica(self, _evento):
-    if(self.dicas_disponiveis > 0 and not self.__nao_deve_continuar__()):
+  def __evento_dica__(self, _evento):
+    if(self.dicas_disponiveis > 0 and not self.__minas_descobertas__()):
       while(True):
         posicao_x = random.randint(0, self.nivel-1)
         posicao_y = random.randint(0, self.nivel-1)
         ponto = self.mapa.pontos[posicao_x][posicao_y]
-        if isinstance(ponto, ponto_mina.PontoMina): 
-          continue
-        self.eventoSelecionar(ponto)
-        self.dicas_disponiveis-=1
-        messagebox.showwarning(title="Aviso!", message=f'Você ainda possui {self.dicas_disponiveis} dica(s)!')
-        break
+        if not isinstance(ponto, ponto_mina.PontoMina) and not ponto.aberto(): 
+          self.__evento_selecionar__(ponto)
+          self.dicas_disponiveis-=1
+          if(not self.__minas_descobertas__()):
+            mensagem = f'Você ainda possui {self.dicas_disponiveis} dicas!'
+            if(self.dicas_disponiveis == 1):
+              mensagem = f'Você ainda possui 1 dica!'
+            elif(self.dicas_disponiveis <= 0):
+              mensagem = f'Não há mais dicas disponíveis!'
+            messagebox.showwarning(title="Aviso!", message=mensagem)
+          break
     else:
       messagebox.showwarning(title="Erro!", message='Não há mais dicas disponíveis!')
 
-  def __nao_deve_continuar__(self) -> bool:
+  def __minas_descobertas__(self) -> bool:
     """Verifica se todas as minas já foram marcadas
 
     Returns
@@ -125,6 +136,6 @@ class CampoMinado:
 def jogar():
   """ Roda o jogo do campo minado, criando novas partida até que o jogador escolha sair"""
   campo_minado = CampoMinado()
-  campo_minado.abrir_janela_inicial()
+  campo_minado.jogar()
 
 jogar()
