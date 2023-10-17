@@ -33,6 +33,31 @@ BOTAO_PADRAO = {
 }
 
 class Janela:
+  """
+  Uma classe que representa uma janela do jogo
+
+  ...
+
+  Attributes
+  ----------
+  janela : TK object
+    é o objeto janela do jogo 
+
+  Methods
+  -------
+  label()
+    Cria um label padrão
+  campo()
+    Cria um campo padrão
+  botao()
+    Cria um botão padrão
+  esconder()
+    Esconde a janela
+  mostrar()
+    Mostra a janela
+  fechar()
+    Fecha a janela
+  """
   def __init__(self, size) -> None:
     self.janela = tk.Tk()
     self.janela.geometry(size)
@@ -40,29 +65,49 @@ class Janela:
     self.janela.title('Campo Minado')
 
   @staticmethod
-  def label(opcoes):
+  def label(opcoes) -> tk.Label:
+    """Cria um label padrão
+
+    Returns
+    ----------
+    tk.Label
+    """
     opcoes = { **LABEL_PADRAO, **opcoes}
     return tk.Label(**opcoes)
 
   @staticmethod
-  def campo(opcoes):
+  def campo(opcoes) -> tk.Entry:
+    """Cria um campo padrão
+
+    Returns
+    ----------
+    tk.Entry
+    """
     opcoes = { **CAMPO_PADRAO, **opcoes}
     return tk.Entry(**opcoes)
 
   @staticmethod
   def botao(opcoes) -> tk.Button:
+    """Cria um botão padrão
+
+    Returns
+    ----------
+    tk.Button
+    """
     opcoes = { **BOTAO_PADRAO, **opcoes}
     return tk.Button(**opcoes)
 
   def esconder(self):
+    """Esconde a janela"""
     self.janela.withdraw()
 
   def mostrar(self):
+    """Mostra a janela"""
     self.janela.deiconify()
 
   def fechar(self):
+    """Fecha a janela"""
     self.janela.quit()
-
 
 class JanelaInicio(Janela):
   def __init__(self) -> None:
@@ -75,6 +120,7 @@ class JanelaInicio(Janela):
     frame.pack()
 
   def __criar_campo_nivel__(self, frame):
+    """Cria o label e o campo do nível e adiciona na janela"""
     self.label({ 
       "text": "Qual o nível de dificuldade desejado?", 
       "master": frame 
@@ -86,6 +132,7 @@ class JanelaInicio(Janela):
     self.campo_nivel.grid(row=2,column=1)
   
   def __criar_botao_iniciar__(self, frame):
+    """Cria o botão de iniciar e adiciona na janela"""
     icone = tk.PhotoImage(file=r'imagens/iniciar.png')
     frame.icone = icone
     self.botao_iniciar = self.botao({ 
@@ -106,6 +153,7 @@ class JanelaJogo(Janela):
     self.janela.protocol("WM_DELETE_WINDOW", self.fechar)
 
   def __criar_grid_mapa__(self, nivel):
+    """Cria os frames do grid do mapa e do contador e adiciona o campo do contador"""
     frame_principal = tk.Frame(master=self.janela, 
                               width= self.tamanho_grid + 50, 
                               height=self.tamanho_grid + 40, 
@@ -138,6 +186,7 @@ class JanelaJogo(Janela):
 
 
   def __criar_campo_contador__(self, frame, nivel):
+    """Cria o label e o campo do contador e adiciona o número de bombas"""
     self.label({ 
       "text": "Quantidade de Bombas:", 
       "master": frame, 
@@ -152,6 +201,7 @@ class JanelaJogo(Janela):
     self.campo_contador.configure(state=tk.DISABLED)
   
   def __criar_botoes__(self):
+    """Cria o frame dos botões e os botões reiniciar, novo jogo, dica e sair"""
     frame_secundario = tk.Frame(master=self.janela, 
                                 width= self.tamanho_grid + 100, 
                                 height=50, 
@@ -168,6 +218,7 @@ class JanelaJogo(Janela):
     self.__criar_botao_sair__(frame_botoes)
 
   def __criar_botao_reiniciar__(self, frame):
+    """Cria o botão reiniciar e adiciona na janela"""
     icone = tk.PhotoImage(file=r'imagens/reiniciar.png')
     frame.icone_reiniciar = icone
     self.botao_reiniciar = self.botao({ 
@@ -178,6 +229,7 @@ class JanelaJogo(Janela):
     self.botao_reiniciar.grid(row=1,column=1,pady=20, padx=5)
 
   def __criar_botao_recomecar__(self, frame):
+    """Cria o botão novo jogo e adiciona na janela"""
     icone = tk.PhotoImage(file=r'imagens/recomecar.png')
     frame.icone_recomecar = icone
     self.botao_recomecar = self.botao({ 
@@ -188,6 +240,7 @@ class JanelaJogo(Janela):
     self.botao_recomecar.grid(row=1,column=2,pady=20, padx=5)
 
   def __criar_botao_dica__(self, frame):
+    """Cria o botão dica e adiciona na janela"""
     icone = tk.PhotoImage(file=r'imagens/dica.png')
     frame.icone_dica = icone
     self.botao_dica = self.botao({ 
@@ -198,6 +251,7 @@ class JanelaJogo(Janela):
     self.botao_dica.grid(row=1,column=3,pady=20, padx=5)
 
   def __criar_botao_sair__(self, frame):
+    """Cria o botão sair, seta o evento de fechar a janela e adiciona o botão na janela"""
     icone = tk.PhotoImage(file=r'imagens/sair.png')
     frame.icone_sair = icone
     self.botao_sair = self.botao({ 

@@ -15,6 +15,8 @@ class Mapa:
   ----------
   nivel : int
     representa a dificuldade do mapa, número de minas e tamanho da matriz quadrada de pontos 
+  frame : tk.Frame
+    frame da janela onde está localizado o grid do mapa
   _pontos : list(list)
     matriz de pontos do campo minado
 
@@ -26,10 +28,6 @@ class Mapa:
     Mostra o mapa do campo minado mostrando todos os pontos
   qtd_minas_descobertas()
     Retorna a quantidade de minas marcadas
-  marcar_ponto(posicao_x, posicao_y)
-    Marca o ponto do campo minado da coordenada x,y
-  revelar_ponto(posicao_x, posicao_y)
-    Abre o ponto do campo minado da coordenada x,y
   __minas__()
     Retorna os pontos que são mina do mapa do campo minado
   __iniciar_mapa_vazio__()
@@ -46,6 +44,8 @@ class Mapa:
     ----------
     nivel : int
       Representa a dificuldade do mapa, número de minas e tamanho da matriz quadrada de pontos
+    frame : tk.Frame
+      É o frame da janela onde está localizado o grid do mapa
     _pontos : list(list)
       Matriz de pontos do campo minado
     """
@@ -71,7 +71,6 @@ class Mapa:
   @frame.setter
   def frame(self, frame):
     self._frame = frame
-  
   
   @property
   def pontos(self) -> list:

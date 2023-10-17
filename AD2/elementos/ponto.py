@@ -16,6 +16,10 @@ class Ponto(ABC):
   ----------
   mapa : Mapa object
     o mapa do campo minado no qual o ponto está localizado
+  frame_grid: tk.Frame object
+    o frame do grid onde o ponto está vinculado
+  frame: tk.Frame object
+    o frame do ponto
   posicao_x : int
     a coordenada x do ponto no mapa
   posicao_y : int
@@ -49,6 +53,8 @@ class Ponto(ABC):
     ----------
     mapa : Mapa object
       O mapa do campo minado no qual o ponto está localizado
+    frame_grid: tk.Frame object
+      O frame do grid onde o ponto está vinculado
     posicao_x : int
       A coordenada x do ponto no mapa
     posicao_y : int
@@ -96,6 +102,7 @@ class Ponto(ABC):
     return self.frame.posicao_x
 
   def mostrar(self):
+    """Mostra o conteúdo do ponto na janela"""
     frame = self.frame
     imagem = tk.PhotoImage(file=self.simbolo)
     frame.imagem = imagem
@@ -111,7 +118,7 @@ class Ponto(ABC):
       self.mostrar()
   
   def fechar(self):
-    """Seta o ponto como aberto e desmarcado"""
+    """Seta o ponto como fechado e desmarcado, ocultando o conteúdo do ponto"""
     self._aberto = False
     self._marcado = False
     self.frame.grid_remove()
@@ -165,6 +172,7 @@ class Ponto(ABC):
     return vizinhos
 
   def __construir_frame__(self):
+    """Constroi e adiciona o ponto na janela com o conteúdo oculto"""
     self.frame = tk.Frame(master=self.frame_grid, width=65, height=65)
     self.frame.grid(row=self.posicao_x, column=self.posicao_y)
     imagem = tk.PhotoImage(file='imagens/vazio.png')
